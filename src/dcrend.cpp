@@ -1,6 +1,10 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
+#include "vec3.h"
+
+using namespace dc;
+
 int main (void) {
     int nx = 200;
     int ny = 100;
@@ -10,15 +14,13 @@ int main (void) {
 
     for (int j = 0; j < ny; ++j) {
         for (int i = 0; i < nx; ++i) {
-            float r = float(i) / float(nx);
-            float g = float(j) / float(ny);
-            float b = 0.2f;
-            float a = 1.f;
+            color col(float(i) / float(nx), float(j) / float(ny), 0.2f);
+            float alpha = 1.f;
             
-            int ir = int(255.99f*r);
-            int ig = int(255.99f*g);
-            int ib = int(255.99f*b);
-            int ia = int(255.99f*a);
+            int ir = int(255.99f*col.r());
+            int ig = int(255.99f*col.g());
+            int ib = int(255.99f*col.b());
+            int ia = int(255.99f*alpha);
             
             int idx = i + j*nx;
             data[nchannel * idx + 0] = ir;
