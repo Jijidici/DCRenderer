@@ -11,6 +11,7 @@ template <class T>
 class vec3 {
 public:
     vec3() {}
+    vec3(T e) { e[0] = e; e[1] = e; e[2] = e; }
     vec3(T e0, T e1, T e2) { e[0] = e0; e[1] = e1; e[2] = e2; }
     inline T x() const { return e[0]; }
     inline T y() const { return e[1]; }
@@ -139,4 +140,4 @@ typedef vec3<float> color;
 typedef vec3<double> v3d;
 typedef vec3<int> v3i;
 
-}
+} // dc
