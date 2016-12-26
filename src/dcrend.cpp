@@ -2,14 +2,16 @@
 #include "stb_image_write.h"
 
 #include "vec3.h"
-#include "GLFW\glfw3.h"
+#include "DCWindow.h"
+
+#define WIDTH 640
+#define HEIGHT 360
 
 using namespace dc;
 
 int main (void) {
 
-	glfwInit();
-    int nx = 200;
+    /*int nx = 200;
     int ny = 100;
     int nchannel = 4;
 
@@ -34,7 +36,15 @@ int main (void) {
     }
 
     stbi_write_png("out.png", nx, ny, nchannel, data, 0);
-    delete[] data;
+    delete[] data;*/
+
+    DCWindow renderWindow(WIDTH, HEIGHT, "DCRenderer");
+
+    while (renderWindow.isStillOpen())
+    {
+
+        renderWindow.endLoop();
+    }
 
 	return 0;
 }
