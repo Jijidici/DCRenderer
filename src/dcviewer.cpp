@@ -42,6 +42,8 @@ int main (void) {
 
     while (renderWindow.isStillOpen())
     {
+        glViewport(0, 0, WIDTH, HEIGHT);
+        glClear(GL_COLOR_BUFFER_BIT);
 
         renderWindow.endLoop();
     }
