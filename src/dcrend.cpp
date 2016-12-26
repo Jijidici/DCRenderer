@@ -2,10 +2,13 @@
 #include "stb_image_write.h"
 
 #include "vec3.h"
+#include "GLFW\glfw3.h"
 
 using namespace dc;
 
 int main (void) {
+
+	glfwInit();
     int nx = 200;
     int ny = 100;
     int nchannel = 4;
