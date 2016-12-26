@@ -2,7 +2,7 @@
 #include "stb_image_write.h"
 
 #include "vec3.h"
-#include "DCWindow.h"
+#include "display/DCWindow.h"
 
 #define WIDTH 640
 #define HEIGHT 360
