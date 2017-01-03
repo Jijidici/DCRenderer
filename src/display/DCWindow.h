@@ -1,9 +1,13 @@
 #pragma once
 
-#include <stdint.h>
 #include <stdlib.h>
 #include <iostream>
+
+#include "GL/glew.h"
 #include "GLFW/glfw3.h"
+
+#include "Screen.h"
+#include "Framebuffer.h"
 
 namespace dc
 {
@@ -16,27 +20,32 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 class DCWindow {
 public:
-    DCWindow(int32_t width, int32_t height, const char * title)
+    DCWindow(size_t width, size_t height, const char * title)
         : m_width(width), m_height(height), m_title(title) {
+        m_screen = new Screen(m_width, m_height);
         init();
     }
 
     ~DCWindow() {
         glfwTerminate();
+        delete m_screen;
     }
 
     void init();
     bool isStillOpen() const;
+    void startLoop() const;
     void endLoop() const;
+    void update(const FrameBuffer * buffer) const;
 
-    inline int32_t width() const { return m_width; }
-    inline int32_t height() const { return m_height; }
-    inline const char * title() const { return m_title; }
+    inline size_t getWidth() const { return m_width; }
+    inline size_t getHeight() const { return m_height; }
+    inline const char * getTitle() const { return m_title; }
 
 private:
     GLFWwindow * m_win;
-    int32_t m_width;
-    int32_t m_height;
+    Screen * m_screen;
+    size_t m_width;
+    size_t m_height;
     const char * m_title;
 };
 

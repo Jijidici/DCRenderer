@@ -1,8 +1,8 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
-#include "vec3.h"
 #include "display/DCWindow.h"
+#include "DCRenderer.h"
 
 #define WIDTH 640
 #define HEIGHT 360
@@ -10,40 +10,18 @@
 using namespace dc;
 
 int main (void) {
-
-    /*int nx = 200;
-    int ny = 100;
-    int nchannel = 4;
-
-    unsigned char * data = new unsigned char[nchannel*nx*ny];
-
-    for (int j = 0; j < ny; ++j) {
-        for (int i = 0; i < nx; ++i) {
-            color col(float(i) / float(nx), float(j) / float(ny), 0.2f);
-            float alpha = 1.f;
-            
-            int ir = int(255.99f*col.r());
-            int ig = int(255.99f*col.g());
-            int ib = int(255.99f*col.b());
-            int ia = int(255.99f*alpha);
-            
-            int idx = i + j*nx;
-            data[nchannel * idx + 0] = ir;
-            data[nchannel * idx + 1] = ig;
-            data[nchannel * idx + 2] = ib;
-            data[nchannel * idx + 3] = ia;
-        }
-    }
-
-    stbi_write_png("out.png", nx, ny, nchannel, data, 0);
-    delete[] data;*/
-
     DCWindow renderWindow(WIDTH, HEIGHT, "DCRenderer");
+    DCRenderer renderer(WIDTH, HEIGHT);
 
-    while (renderWindow.isStillOpen())
-    {
-        glViewport(0, 0, WIDTH, HEIGHT);
-        glClear(GL_COLOR_BUFFER_BIT);
+    std::string beautyPass = "beauty";
+    renderer.genFrameBuffer(beautyPass, Format::RGB);
+
+    while (renderWindow.isStillOpen()) {
+        renderWindow.startLoop();
+
+        renderer.render(beautyPass);
+        const FrameBuffer * beautyFB = renderer.getFramebuffer(beautyPass);
+        renderWindow.update(beautyFB);
 
         renderWindow.endLoop();
     }
