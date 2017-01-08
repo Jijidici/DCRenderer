@@ -11,7 +11,7 @@ template <class T>
 class vec3 {
 public:
     vec3() {}
-    vec3(T e) { e[0] = e; e[1] = e; e[2] = e; }
+    vec3(T v) { e[0] = v; e[1] = v; e[2] = v; }
     vec3(T e0, T e1, T e2) { e[0] = e0; e[1] = e1; e[2] = e2; }
     inline T x() const { return e[0]; }
     inline T y() const { return e[1]; }
@@ -59,7 +59,7 @@ inline vec3<T> cross(const vec3<T>& v1, const vec3<T>& v2) {
 template <class T>
 inline vec3<T> normalize(const vec3<T>& v) {
     vec3<T> res = v;
-    res.normalized()
+    res.normalized();
     return res;
 }
 
