@@ -5,7 +5,7 @@
 #include "DCRenderer.h"
 
 #define WIDTH 640
-#define HEIGHT 360
+#define HEIGHT 320
 
 using namespace dc;
 

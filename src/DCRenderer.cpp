@@ -35,7 +35,19 @@ const FrameBuffer * DCRenderer::getFramebuffer(std::string & fbName) {
 }
 
 // Local functions
+bool hitSphere(const v3f & center, float radius, const ray & r) {
+    v3f oc = r.origin() - center;
+    float a = dot(r.direction(), r.direction());
+    float b = 2.f * dot(oc, r.direction());
+    float c = dot(oc, oc) - radius * radius;
+    float discriminant = b * b - 4.f * a * c;
+    return (discriminant > 0.f);
+}
+
 v3f computeColor(const ray & r) {
+    if (hitSphere(v3f(0.f, 0.f, -1.f), 0.5f, r))
+        return color(1.f, 0.f, 0.f);
+
     float t = 0.5f * (r.direction().y() + 1.f);
     return (1.f - t) * color(1.f, 1.f, 1.f) + t * color(0.5f, 0.7f, 1.f);
 }
@@ -49,7 +61,7 @@ void DCRenderer::render(std::string & fbName) {
     float * buffer = fb->getBuffer();
 
     v3f lowerLeftCorner(-2.f, -1.f, -1.f);
-    v3f horizontal(-4.f, 0.f, 0.f);
+    v3f horizontal(4.f, 0.f, 0.f);
     v3f vertical(0.f, 2.f, 0.f);
     v3f origin(0.f, 0.f, 0.f);
 
