@@ -66,13 +66,13 @@ inline vec3<T> normalize(const vec3<T>& v) {
 // stream functions
 template <class T>
 inline std::istream& operator>>(std::istream& is, vec3<T>& v) {
-    is >> v.e[0] >> v.e[1] >> v.e[2];
+    is >> v[0] >> v[1] >> v[2];
     return is;
 }
 
 template <class T>
 inline std::ostream& operator<<(std::ostream& os, vec3<T>& v) {
-    os << v.e[0] << " " << v.e[1] << " " << v.e[2];
+    os << v[0] << " " << v[1] << " " << v[2];
     return os;
 }
 

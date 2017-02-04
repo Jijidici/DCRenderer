@@ -14,7 +14,8 @@ project "DCRend"
 	libdirs { "lib/glfw/lib", "lib/glew/lib/Release/x64" }
 	links { "glfw3dll", "opengl32", "glew32" }
 	files  { "src/*.h", "src/*.cpp", 
-			 "src/display/*.h", "src/display/*.cpp" }
+			 "src/display/*.h", "src/display/*.cpp",
+			 "src/scene/*h", "src/scene/*.cpp" }
 
 	filter "configurations:Debug"
 		defines { "DEBUG" }

@@ -1,7 +1,14 @@
 #include "DCRenderer.h"
 
+#include <vector>
+
 #include "vec3.h"
 #include "ray.h"
+#include "scene/HitableList.h"
+#include "scene/Sphere.h"
+
+#define R_NEAR 0.001f
+#define R_FAR  1000000.f 
 
 namespace dc 
 {
@@ -35,29 +42,15 @@ const FrameBuffer * DCRenderer::getFramebuffer(std::string & fbName) {
 }
 
 // Local functions
-float hitSphere(const v3f & center, float radius, const ray & r) {
-    v3f oc = r.origin() - center;
-    float a = dot(r.direction(), r.direction());
-    float b = 2.f * dot(oc, r.direction());
-    float c = dot(oc, oc) - radius * radius;
-    float discriminant = b * b - 4.f * a * c;
-    if (discriminant < 0.f)
-        return -1.f;
-    else
-        return (-b - sqrtf(discriminant)) / (2.0f * a);
-}
-
-v3f computeColor(const ray & r) {
-    v3f sphereCenter = v3f(0.f, 0.f, -1.f);
-    float sphereRadius = 0.5f;
-    float t = hitSphere(sphereCenter, sphereRadius, r);
-    if (t > 0.f) {
-        v3f N = normalize(r.pointAtParameter(t) - sphereCenter);
-        return 0.5f * (N + 1.f);
+v3f computeColor(const ray & r, const HitableList & scene) {
+    Hitable::HitRecord hitRec = scene.hit(r, R_NEAR, R_FAR);
+    if (hitRec.t > 0.f) {
+        return 0.5f * (hitRec.N + 1.f);
     }
 
-    t = 0.5f * (r.direction().y() + 1.f);
-    return (1.f - t) * color(1.f, 1.f, 1.f) + t * color(0.5f, 0.7f, 1.f);
+    // hit background
+    float bgMixCoef = 0.5f * (r.direction().y() + 1.f);
+    return (1.f - bgMixCoef) * color(1.f, 1.f, 1.f) + bgMixCoef * color(0.5f, 0.7f, 1.f);
 }
 
 // Main render function
@@ -73,6 +66,11 @@ void DCRenderer::render(std::string & fbName) {
     v3f vertical(0.f, 2.f, 0.f);
     v3f origin(0.f, 0.f, 0.f);
 
+    // Construct the scene
+    HitableList scene;
+    scene.append(new Sphere(v3f(0.f, 0.f, -1.f), 0.5f));
+    scene.append(new Sphere(v3f(0.f, -100.5f, -1.f), 100.f));
+
     for (size_t j = 0; j < ny; ++j) {
         for (size_t i = 0; i < nx; ++i) {
 
@@ -80,7 +78,7 @@ void DCRenderer::render(std::string & fbName) {
             float u = float(i) / float(nx);
             float v = float(j) / float(ny);
             ray r(origin, lowerLeftCorner + u * horizontal + v * vertical);
-            color col = computeColor(r);
+            color col = computeColor(r, scene);
 
             // fill the framebuffer
             size_t idx = i + j*nx;
