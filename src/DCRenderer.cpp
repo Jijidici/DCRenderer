@@ -56,7 +56,7 @@ v3f computeColor(const ray & r, const HitableList & scene) {
 }
 
 // Main render function
-void DCRenderer::render(std::string & fbName) {
+void DCRenderer::render(std::string & fbName, const size_t sampleID) {
     const FrameBuffer * fb = getFramebuffer(fbName);
     size_t nx = fb->getWidth();
     size_t ny = fb->getHeight();
@@ -72,7 +72,7 @@ void DCRenderer::render(std::string & fbName) {
     scene.append(new Sphere(v3f(0.f, -100.5f, -1.f), 100.f));
 
     // Setup the random samples
-    std::default_random_engine generator;
+    std::default_random_engine generator(sampleID);
     std::uniform_real_distribution<float> distribution;
 
     // Setup the camera
@@ -80,21 +80,16 @@ void DCRenderer::render(std::string & fbName) {
 
     for (size_t j = 0; j < ny; ++j) {
         for (size_t i = 0; i < nx; ++i) {
-            color col(0.f);
-            for (size_t s = 0; s < ns; ++s)
-            {
-                // rendering code
-                float u = float(i + distribution(generator)) / float(nx);
-                float v = float(j + distribution(generator)) / float(ny);
-                ray r = cam.getRay(u, v);
-                col += computeColor(r, scene);
-            }
+            // rendering code
+            float u = float(i + distribution(generator)) / float(nx);
+            float v = float(j + distribution(generator)) / float(ny);
+            ray r = cam.getRay(u, v);
+            color col = computeColor(r, scene);
 
             // fill the framebuffer
-            col /= float(ns);
             size_t idx = i + j*nx;
             for (size_t c = 0; c < nchannel; ++c)
-                buffer[int(nchannel * idx + c)] = col[int(c)];
+                buffer[int(nchannel * idx + c)] += col[int(c)];
         }
     }
 }

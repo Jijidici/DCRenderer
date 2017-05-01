@@ -17,7 +17,7 @@ public:
     bool genFrameBuffer(std::string & fbName, size_t channel);
     const FrameBuffer * getFramebuffer(std::string & fbName);
 
-    void render(std::string & fbName);
+    void render(std::string & fbName, const size_t sampleID);
 
 private:
     size_t m_width;

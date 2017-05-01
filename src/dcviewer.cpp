@@ -16,12 +16,15 @@ int main (void) {
     std::string beautyPass = "beauty";
     renderer.genFrameBuffer(beautyPass, Format::RGB);
 
+    size_t sampleCount = 0;
     while (renderWindow.isStillOpen()) {
         renderWindow.startLoop();
 
-        renderer.render(beautyPass);
+        ++sampleCount;
+        fprintf(stdout, "Samples : %d\n", sampleCount);
+        renderer.render(beautyPass, sampleCount);
         const FrameBuffer * beautyFB = renderer.getFramebuffer(beautyPass);
-        renderWindow.update(beautyFB);
+        renderWindow.update(beautyFB, sampleCount);
 
         renderWindow.endLoop();
     }

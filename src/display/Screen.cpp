@@ -49,8 +49,9 @@ void Screen::init() {
         out vec4 fragColor; \n\
         in vec2 uv; \n\
         uniform sampler2D uTex; \n\
+        uniform float uSampleCount; \n\
         void main() { \n\
-             fragColor = vec4(texture(uTex, uv).rgb, 1.0); \n\
+             fragColor = vec4(texture(uTex, uv).rgb / uSampleCount, 1.0); \n\
         } ";
 
     m_program = new Program(buildProgram(vShader, fShader));
@@ -60,16 +61,24 @@ void Screen::init() {
     GLuint texLocation = glGetUniformLocation(m_program->getGLId(), "uTex");
     glProgramUniform1i(m_program->getGLId(), texLocation, 0);
     glActiveTexture(GL_TEXTURE0);
+
+    // get sample count uniform
+    m_sampleCountLocation = glGetUniformLocation(m_program->getGLId(), "uSampleCount");
 }
 
 void Screen::updateTexture(const FrameBuffer * buffer) {
     glBindTexture(GL_TEXTURE_2D, m_texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, (GLsizei) buffer->getWidth(), (GLsizei) buffer->getHeight(), 0, GL_RGB, GL_FLOAT, (const GLvoid *) buffer->getBuffer());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, (GLsizei) buffer->getWidth(), (GLsizei) buffer->getHeight(), 0, GL_RGB, GL_FLOAT, (const GLvoid *) buffer->getBuffer());
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void Screen::updateSampleCount(const size_t sampleCount)
+{
+    glProgramUniform1f(m_program->getGLId(), m_sampleCountLocation, (float)sampleCount);
 }
 
 void Screen::draw() const {

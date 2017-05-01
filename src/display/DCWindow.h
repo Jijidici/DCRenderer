@@ -35,7 +35,7 @@ public:
     bool isStillOpen() const;
     void startLoop() const;
     void endLoop() const;
-    void update(const FrameBuffer * buffer) const;
+    void update(const FrameBuffer * buffer, const size_t sampleCount) const;
 
     inline size_t getWidth() const { return m_width; }
     inline size_t getHeight() const { return m_height; }

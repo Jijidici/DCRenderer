@@ -22,6 +22,7 @@ public:
 
     void init();
     void updateTexture(const FrameBuffer * buffer);
+    void updateSampleCount(const size_t sampleCount);
     void draw() const;
 
 
@@ -31,6 +32,7 @@ private:
     GLuint m_quadVAO;
     GLuint m_quadVBO[3];
     GLuint m_texture;
+    GLuint m_sampleCountLocation;
     Program * m_program;
 
 

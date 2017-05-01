@@ -52,8 +52,9 @@ void DCWindow::endLoop() const {
     glfwPollEvents();
 }
 
-void DCWindow::update(const FrameBuffer * buffer) const {
+void DCWindow::update(const FrameBuffer * buffer, const size_t sampleCount) const {
     m_screen->updateTexture(buffer);
+    m_screen->updateSampleCount(sampleCount);
     m_screen->draw();
 }
 
