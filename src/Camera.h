@@ -13,7 +13,7 @@ public:
         , vertical(0.f, 2.f, 0.f)
     {}
 
-    ray getRay(float u, float v) {
+    ray getRay(float u, float v) const {
         return ray(origin, lowerLefCorner + u * horizontal + v * vertical - origin);
     }
 

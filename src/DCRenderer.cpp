@@ -55,36 +55,37 @@ v3f computeColor(const ray & r, const HitableList & scene) {
     return (1.f - bgMixCoef) * color(1.f, 1.f, 1.f) + bgMixCoef * color(0.5f, 0.7f, 1.f);
 }
 
+// Setup function
+void DCRenderer::prepare(const HitableList * scene, const Camera * camera) {
+    m_scene = scene;
+    m_camera = camera;
+}
+
 // Main render function
 void DCRenderer::render(std::string & fbName, const size_t sampleID) {
+    if (m_scene == nullptr || m_camera == nullptr)
+    {
+        std::fprintf(stderr, "Scene or Camera has not be set before the render begins\n");
+        return;
+    }
+
     const FrameBuffer * fb = getFramebuffer(fbName);
     size_t nx = fb->getWidth();
     size_t ny = fb->getHeight();
-    size_t ns = 20;
     size_t nchannel = fb->getChannel();
     float * buffer = fb->getBuffer();
-
-    
-
-    // Construct the scene
-    HitableList scene;
-    scene.append(new Sphere(v3f(0.f, 0.f, -1.f), 0.5f));
-    scene.append(new Sphere(v3f(0.f, -100.5f, -1.f), 100.f));
 
     // Setup the random samples
     std::default_random_engine generator(sampleID);
     std::uniform_real_distribution<float> distribution;
-
-    // Setup the camera
-    Camera cam;
 
     for (size_t j = 0; j < ny; ++j) {
         for (size_t i = 0; i < nx; ++i) {
             // rendering code
             float u = float(i + distribution(generator)) / float(nx);
             float v = float(j + distribution(generator)) / float(ny);
-            ray r = cam.getRay(u, v);
-            color col = computeColor(r, scene);
+            ray r = m_camera->getRay(u, v);
+            color col = computeColor(r, *m_scene);
 
             // fill the framebuffer
             size_t idx = i + j*nx;
