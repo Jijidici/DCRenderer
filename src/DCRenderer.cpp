@@ -1,19 +1,18 @@
 #include "DCRenderer.h"
 
 #include <vector>
-#include <random>
+#include <thread>
 
-#include "vec3.h"
-#include "ray.h"
+#include "RenderTask.h"
 #include "Camera.h"
 #include "scene/HitableList.h"
 #include "scene/Sphere.h"
 
-#define R_NEAR 0.001f
-#define R_FAR  1000000.f 
-
 namespace dc 
 {
+
+#define R_NEAR 0.001f
+#define R_FAR  1000000.f
 
 DCRenderer::~DCRenderer() {
     for (auto fb : m_frameBuffers)
@@ -34,7 +33,7 @@ bool DCRenderer::genFrameBuffer(std::string & fbName, size_t channel)
     return false;
 }
 
-const FrameBuffer * DCRenderer::getFramebuffer(std::string & fbName) {
+const FrameBuffer * DCRenderer::getFramebuffer(const std::string fbName) {
     auto found = m_frameBuffers.find(fbName);
     if (found != m_frameBuffers.end())
     {
@@ -43,9 +42,8 @@ const FrameBuffer * DCRenderer::getFramebuffer(std::string & fbName) {
     return nullptr;
 }
 
-// Local functions
-v3f computeColor(const ray & r, const HitableList & scene) {
-    Hitable::HitRecord hitRec = scene.hit(r, R_NEAR, R_FAR);
+v3f DCRenderer::computeColor(const ray & r) {
+    Hitable::HitRecord hitRec = m_scene->hit(r, R_NEAR, R_FAR);
     if (hitRec.t > 0.f) {
         return 0.5f * (hitRec.N + 1.f);
     }
@@ -59,40 +57,24 @@ v3f computeColor(const ray & r, const HitableList & scene) {
 void DCRenderer::prepare(const HitableList * scene, const Camera * camera) {
     m_scene = scene;
     m_camera = camera;
+    m_threadCount = std::thread::hardware_concurrency();
 }
 
 // Main render function
-void DCRenderer::render(std::string & fbName, const size_t sampleID) {
+void DCRenderer::render(const std::string fbName, const size_t sampleID) {
     if (m_scene == nullptr || m_camera == nullptr)
     {
         std::fprintf(stderr, "Scene or Camera has not be set before the render begins\n");
-        return;
+        exit(EXIT_FAILURE);
     }
 
-    const FrameBuffer * fb = getFramebuffer(fbName);
-    size_t nx = fb->getWidth();
-    size_t ny = fb->getHeight();
-    size_t nchannel = fb->getChannel();
-    float * buffer = fb->getBuffer();
-
-    // Setup the random samples
-    std::default_random_engine generator(sampleID);
-    std::uniform_real_distribution<float> distribution;
-
-    for (size_t j = 0; j < ny; ++j) {
-        for (size_t i = 0; i < nx; ++i) {
-            // rendering code
-            float u = float(i + distribution(generator)) / float(nx);
-            float v = float(j + distribution(generator)) / float(ny);
-            ray r = m_camera->getRay(u, v);
-            color col = computeColor(r, *m_scene);
-
-            // fill the framebuffer
-            size_t idx = i + j*nx;
-            for (size_t c = 0; c < nchannel; ++c)
-                buffer[int(nchannel * idx + c)] += col[int(c)];
-        }
-    }
+    RenderTask task(this);
+    std::vector<std::thread> threads(m_threadCount);
+    for (uint32_t i = 0; i < m_threadCount; ++i)
+        threads[i] = std::thread([&task, fbName, sampleID] { task.renderSample(fbName, sampleID); });
+    
+    for (uint32_t i = 0; i < m_threadCount; ++i)
+        threads[i].join();
 }
 
 } // dc
