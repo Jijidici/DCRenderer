@@ -33,7 +33,7 @@ public:
     inline vec3& operator/=(const T t) { e[0] /= t; e[1] /= t; e[2] /= t; return *this; }
 
     inline T length() const { return sqrt(e[0] * e[0] + e[1] * e[1] + e[2] * e[2]); }
-    inline T squared_length() const { return e[0] * e[0] + e[1] * e[1] + e[2] * e[2]; }
+    inline T squaredLength() const { return e[0] * e[0] + e[1] * e[1] + e[2] * e[2]; }
     inline void normalized() {
         T k = ((T)1) / length();
         e[0] *= k; e[1] *= k; e[2] *= k;

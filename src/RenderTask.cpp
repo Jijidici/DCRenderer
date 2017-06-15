@@ -28,7 +28,6 @@ void RenderTask::renderSample(const std::string fbName, const size_t sampleID) {
 
         // Setup the random samples
         std::default_random_engine generator((sampleID + 223) * currentTile);
-        std::uniform_real_distribution<float> distribution;
 
         // Get framebuffer
         const FrameBuffer * fb = m_rend->getFramebuffer(fbName);
@@ -38,10 +37,10 @@ void RenderTask::renderSample(const std::string fbName, const size_t sampleID) {
         for (uint32_t j = tileBeginY; j < tileEndY; ++j) {
             for (uint32_t i = tileBeginX; i < tileEndX; ++i) {
                 // rendering code
-                float u = float(i + distribution(generator)) / float(width);
-                float v = float(j + distribution(generator)) / float(height);
+                float u = float(i + m_rend->m_distribution(generator)) / float(width);
+                float v = float(j + m_rend->m_distribution(generator)) / float(height);
                 ray r = m_rend->m_camera->getRay(u, v);
-                color col = m_rend->computeColor(r);
+                color col = m_rend->computeColor(r, generator);
 
                 // fill the framebuffer
                 uint32_t idx = i + j * width;

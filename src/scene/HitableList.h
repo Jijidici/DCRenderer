@@ -11,7 +11,7 @@ public:
     HitableList() {}
     ~HitableList(); // WARNING: HitableList is responsible for hitable objects it contains. The destructor will delete them
     void append(const Hitable * hitable);
-    virtual HitRecord hit(const ray & r, const float t_min, const float t_max) const override;
+    virtual bool hit(const ray & r, const float t_min, const float t_max, HitRecord & record) const override;
 
 private:
     std::vector<const Hitable *> m_list;

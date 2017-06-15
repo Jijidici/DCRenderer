@@ -11,12 +11,14 @@ public:
     struct HitRecord {
         HitRecord() : t(-1.f), P(v3f(0.f)), N(v3f(0.f)) {}
 
+        
+
         float t;
         v3f P;
         v3f N;
     };
 
-    virtual HitRecord hit(const ray & r, const float t_min, const float t_max) const = 0;
+    virtual bool hit(const ray & r, const float t_min, const float t_max, HitRecord & record) const = 0;
 };
 
 } // dc

@@ -15,22 +15,20 @@ void HitableList::append(const Hitable * hitable) {
     m_list.push_back(hitable);
 }
 
-HitableList::HitRecord HitableList::hit(const ray & r, const float t_min, const float t_max) const {
-    HitRecord retRec;
+bool HitableList::hit(const ray & r, const float t_min, const float t_max, HitRecord & record) const {
     HitRecord tmpRec;
+    bool hitAnything = false;
     float closestSoFar = t_max;
     for (auto h : m_list) {
-        tmpRec = h->hit(r, t_min, closestSoFar);
-        if (tmpRec.t > 0.f)
+        if (h->hit(r, t_min, closestSoFar, tmpRec))
         {
-            retRec.t = tmpRec.t;
-            retRec.P = tmpRec.P;
-            retRec.N = tmpRec.N;
-            closestSoFar = retRec.t;
+            hitAnything = true;
+            closestSoFar = tmpRec.t;
+            record = tmpRec;
         }
     }
 
-    return retRec;
+    return hitAnything;
 }
 
 } // dc

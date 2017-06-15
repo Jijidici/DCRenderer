@@ -12,7 +12,7 @@ namespace dc
 {
 
 #define R_NEAR 0.001f
-#define R_FAR  1000000.f
+#define R_FAR  10000.f
 
 DCRenderer::~DCRenderer() {
     for (auto fb : m_frameBuffers)
@@ -42,17 +42,6 @@ const FrameBuffer * DCRenderer::getFramebuffer(const std::string fbName) {
     return nullptr;
 }
 
-v3f DCRenderer::computeColor(const ray & r) {
-    Hitable::HitRecord hitRec = m_scene->hit(r, R_NEAR, R_FAR);
-    if (hitRec.t > 0.f) {
-        return 0.5f * (hitRec.N + 1.f);
-    }
-
-    // hit background
-    float bgMixCoef = 0.5f * (r.direction().y() + 1.f);
-    return (1.f - bgMixCoef) * color(1.f, 1.f, 1.f) + bgMixCoef * color(0.5f, 0.7f, 1.f);
-}
-
 // Setup function
 void DCRenderer::prepare(const HitableList * scene, const Camera * camera) {
     m_scene = scene;
@@ -75,6 +64,28 @@ void DCRenderer::render(const std::string fbName, const size_t sampleID) {
     
     for (uint32_t i = 0; i < m_threadCount; ++i)
         threads[i].join();
+}
+
+// Shading functions
+v3f DCRenderer::computeColor(const ray & r, std::default_random_engine & generator) const {
+    Hitable::HitRecord hitRec;
+    if (m_scene->hit(r, R_NEAR, R_FAR, hitRec)) {
+        v3f target = hitRec.P + hitRec.N + randomInUnitSphere(generator);
+        return 0.5f * computeColor(ray(hitRec.P, target - hitRec.P), generator);
+    }
+
+    // hit background
+    float bgMixCoef = 0.5f * (r.direction().y() + 1.f);
+    return (1.f - bgMixCoef) * color(1.f, 1.f, 1.f) + bgMixCoef * color(0.5f, 0.7f, 1.f);
+}
+
+
+v3f DCRenderer::randomInUnitSphere(std::default_random_engine & generator) const {
+    v3f p;
+    do {
+        p = 2.f * v3f(m_distribution(generator), m_distribution(generator), m_distribution(generator)) - v3f(1.f);
+    } while (p.squaredLength() >= 1.f);
+    return p;
 }
 
 } // dc

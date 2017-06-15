@@ -3,8 +3,7 @@
 namespace dc
 {
 
-Sphere::HitRecord Sphere::hit(const ray & r, const float t_min, const float t_max) const {
-    HitRecord retRec;
+bool Sphere::hit(const ray & r, const float t_min, const float t_max, HitRecord & record) const {
     v3f oc = r.origin() - m_center;
     float a = dot(r.direction(), r.direction());
     float b = dot(oc, r.direction());
@@ -13,18 +12,21 @@ Sphere::HitRecord Sphere::hit(const ray & r, const float t_min, const float t_ma
     if (discriminant > 0.f) {
         float t1 = (-b - sqrtf(discriminant)) / a;
         float t2 = (-b + sqrtf(discriminant)) / a;
+        float t = -1.f;;
         if (t1 > t_min && t1 < t_max)
-            retRec.t = t1;
+            t = t1;
         else if (t2 > t_min && t2 < t_max)
-            retRec.t = t2;
+            t = t2;
 
-        if (retRec.t > 0.f) {
-            retRec.P = r.pointAtParameter(retRec.t);
-            retRec.N = (retRec.P - m_center) / m_radius;
+        if (t > 0.f) {
+            record.P = r.pointAtParameter(t);
+            record.N = (record.P - m_center) / m_radius;
+            record.t = t;
+            return true;
         }
     }
 
-    return retRec;
+    return false;
 }
 
 } // dc
